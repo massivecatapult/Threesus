@@ -126,7 +126,7 @@ namespace Threesus.CoreGame
 		/// <summary>
 		/// Returns whether the specified Cards are equal.
 		/// </summary>
-		public static bool operator ==(Card card1, Card card2)
+		public static bool operator == (Card card1, Card card2)
 		{
 			return Equals(card1, card2);
 		}

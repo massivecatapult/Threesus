@@ -20,22 +20,32 @@ namespace Threesus
 			// Build the board and initialize the deck.
 			Deck deck = new Deck(new Rand());
 			Board board = new Board();
-			Console.WriteLine("Let's initialize the board...");
-			Console.WriteLine("The format for each line should be four characters, each a 1, 2, 3, or any other character to represent an empty space.");
+			Console.WriteLine("Enter the game board configuration to begin.");
+			Console.WriteLine("Each line is a list of values separated by commas (i.e.: 0, 1, 2, 3).\n");
 			for(int y = 0; y < board.Height; y++)
 			{
-				Console.Write("Enter row {0}: ", y);
+				Console.Write("Enter row {0}: ", y + 1);
 				string rowStr = Console.ReadLine();
+				rowStr = rowStr.Replace(" ", "");
+				string[] numbers = rowStr.Split(',');
+				/*
 				if(rowStr.Length != board.Width)
 				{
 					Console.WriteLine("Invalid length of entered row.");
 					y--;
 					continue;
 				}
+				*/
+				if(numbers.Length != board.Width)
+                {
+					Console.WriteLine("Invalid number of cards entered to row, please try again.");
+					y--;
+					continue;
+                }
 
 				for(int x = 0; x < board.Width; x++)
 				{
-					Card card = GetCardFromChar(rowStr[x], false);
+					Card card = GetCardFromChar(numbers[x], false);
 					if(card != null)
 					{
 						board[x, y] = card;
@@ -43,7 +53,7 @@ namespace Threesus
 					}
 				}
 			}
-			Console.WriteLine("Board and deck successfully initialized.");
+			Console.WriteLine("\nThanks - board and deck successfully initialized!");
 
 			Stack<Board> boardsStack = new Stack<Board>();
 			Stack<Deck> decksStack = new Stack<Deck>();
@@ -54,21 +64,29 @@ namespace Threesus
 			redo:
 
 				// Print the current board status.
-				Console.WriteLine("--------------------");
+				Console.WriteLine("\n+-------CURRENT BOARD-------+");
 				for(int y = 0; y < board.Height; y++)
 				{
+					Console.Write("|");
 					for(int x = 0; x < board.Width; x++)
 					{
 						Card c = board[x, y];
-						if(c != null)
-							Console.Write("{0},", c.Value);
+						if (c != null)
+						{
+							string cardValue = c.Value.ToString().PadLeft(5, ' ').PadRight(6, ' ') + '|';
+							Console.Write(cardValue);
+						}
 						else
-							Console.Write(" ,");
+							Console.Write("      |");
 					}
 					Console.WriteLine();
 				}
-				Console.WriteLine("--------------------");
-				Console.WriteLine("Current total score: {0}", board.GetTotalScore());
+				Console.WriteLine("+---------------------------+\n");
+				string score = board.GetTotalScore().ToString();
+				score = " SCORE: " + score + " ";
+				//Console.WriteLine(score.PadLeft(18, '*').PadRight(29, '*'));
+				Console.WriteLine(score);
+				Console.WriteLine();
 
 				// Get the next card.
 				Console.Write("What is the next card? ");
@@ -84,14 +102,18 @@ namespace Threesus
 						goto redo;
 					}
 				}
-				while(nextCardStr.Length != 1 || (nextCard = GetCardFromChar(nextCardStr[0], true)) == null);
+				while (nextCardStr.Length != 1 || (nextCard = GetCardFromChar(nextCardStr, true)) == null);
+				//nextCardStr[0]
 				NextCardHint nextCardHint = GetNextCardHint(nextCard);
 
 				// Choose a move.
 				Console.Write("Thinking...");
 				ShiftDirection? aiDir = _bot.GetNextMove(new FastBoard(board), new FastDeck(deck), nextCardHint);
-				if(aiDir != null)
-					Console.WriteLine("\nSWIPE {0}.", aiDir.Value.ToString().ToUpper());
+				if (aiDir != null)
+				{
+					Console.Clear();
+					Console.WriteLine("SWIPE {0}\n", aiDir.Value.ToString().ToUpper());
+				}
 				else
 				{
 					Console.WriteLine("NO MORE MOVES.");
@@ -114,20 +136,20 @@ namespace Threesus
 				int newCardIndex;
 				if(newCardCells.Count > 1)
 				{
-					Console.WriteLine("Here are the locations where a new card might have been inserted:");
+					Console.WriteLine("Here are the locations where a new card might have appeared:\n");
 					for(int y = 0; y < board.Height; y++)
 					{
 						for(int x = 0; x < board.Width; x++)
 						{
 							int index = newCardCells.IndexOf(new IntVector2D(x, y));
 							if(index >= 0)
-								Console.Write((char)('a' + index));
+								Console.Write(" " + "abcd"[index] + " ");
 							else
-								Console.Write('.');
+								Console.Write(" . ");
 						}
 						Console.WriteLine();
 					}
-					Console.Write("Where was it actually inserted? ");
+					Console.Write("\nWhere did the new card appear? ");
 					do
 					{
 						string indexStr = Console.ReadLine();
@@ -149,7 +171,7 @@ namespace Threesus
 				{
 					do
 					{
-						Console.Write("!!! What is the value of the new card? ");
+						Console.Write("*** What is the value of the new card? ");
 					}
 					while(!TryGetNewCardValue(Console.ReadLine(), out newCardValue));
 				}
@@ -170,17 +192,39 @@ namespace Threesus
 		/// <summary>
 		/// Gets the card that is indicated by the specified character.
 		/// </summary>
-		private static Card GetCardFromChar(char c, bool allowBonusCard)
+		private static Card GetCardFromChar(string c, bool allowBonusCard)
 		{
 			switch(c)
 			{
-				case '1':
+				case "1":
 					return new Card(1, -1);
-				case '2':
+				case "2":
 					return new Card(2, -2);
-				case '3':
+				case "3":
 					return new Card(3, -1);
-				case '+':
+				case "6":
+					return new Card(6, -1);
+				case "12":
+					return new Card(12, -1);
+				case "24":
+					return new Card(24, -1);
+				case "48":
+					return new Card(48, -1);
+				case "96":
+					return new Card(96, -1);
+				case "192":
+					return new Card(192, -1);
+				case "384":
+					return new Card(384, -1);
+				case "768":
+					return new Card(768, -1);
+				case "1536":
+					return new Card(1536, -1);
+				case "3072":
+					return new Card(3072, -1);
+				case "6144":
+					return new Card(6144, -1);
+				case "+":
 					if(allowBonusCard)
 						return new Card(-1, -1);
 					else
