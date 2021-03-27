@@ -112,7 +112,9 @@ namespace Threesus
 				if (aiDir != null)
 				{
 					Console.Clear();
-					Console.WriteLine("SWIPE {0}\n", aiDir.Value.ToString().ToUpper());
+					Console.WriteLine("/// YOUR MOVE ///////////////\n");
+					Console.WriteLine("   SWIPE {0}\n", aiDir.Value.ToString().ToUpper());
+					Console.WriteLine("/////////////////////////////\n");
 				}
 				else
 				{
@@ -171,7 +173,7 @@ namespace Threesus
 				{
 					do
 					{
-						Console.Write("*** What is the value of the new card? ");
+						Console.Write("\nWhat is the value of the new card? ");
 					}
 					while(!TryGetNewCardValue(Console.ReadLine(), out newCardValue));
 				}
