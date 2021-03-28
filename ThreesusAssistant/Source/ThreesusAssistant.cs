@@ -20,9 +20,11 @@ namespace Threesus
 			// Build the board and initialize the deck.
 			Deck deck = new Deck(new Rand());
 			Board board = new Board();
+			Console.WriteLine("THREESUS - Threes solver\n");
 			Console.WriteLine("Enter the game board configuration to begin.");
-			Console.WriteLine("Each line is a list of values separated by commas (i.e.: 0, 1, 2, 3).\n");
-			for(int y = 0; y < board.Height; y++)
+			Console.WriteLine("Each line is a list of values separated by commas (for example: 0, 1, 2, 3).");
+			Console.WriteLine("Any valid card value may be entered (up to 6144). Invalid values, such as 0, will count as an empty space.\n");
+			for (int y = 0; y < board.Height; y++)
 			{
 				Console.Write("Enter row {0}: ", y + 1);
 				string rowStr = Console.ReadLine();
@@ -53,7 +55,8 @@ namespace Threesus
 					}
 				}
 			}
-			Console.WriteLine("\nThanks - board and deck successfully initialized!");
+			//Console.WriteLine("\nThanks - board and deck successfully initialized!");
+			Console.Clear();
 
 			Stack<Board> boardsStack = new Stack<Board>();
 			Stack<Deck> decksStack = new Stack<Deck>();
@@ -64,7 +67,7 @@ namespace Threesus
 			redo:
 
 				// Print the current board status.
-				Console.WriteLine("\n+-------CURRENT BOARD-------+");
+				Console.WriteLine("+-------CURRENT BOARD-------+");
 				for(int y = 0; y < board.Height; y++)
 				{
 					Console.Write("|");
@@ -82,16 +85,18 @@ namespace Threesus
 					Console.WriteLine();
 				}
 				Console.WriteLine("+---------------------------+\n");
-				string score = board.GetTotalScore().ToString();
-				score = " SCORE: " + score + " ";
+				//string score = board.GetTotalScore().ToString();
+				//score = "SCORE: " + score;
 				//Console.WriteLine(score.PadLeft(18, '*').PadRight(29, '*'));
-				Console.WriteLine(score);
+				Console.WriteLine("SCORE: {0}", board.GetTotalScore());
 				Console.WriteLine();
 
 				// Get the next card.
 				Console.Write("What is the next card? ");
 				string nextCardStr;
+				string[] validCards = { "1", "2", "3", "+" };
 				Card nextCard;
+
 				do
 				{
 					nextCardStr = Console.ReadLine();
@@ -102,7 +107,8 @@ namespace Threesus
 						goto redo;
 					}
 				}
-				while (nextCardStr.Length != 1 || (nextCard = GetCardFromChar(nextCardStr, true)) == null);
+
+				while (nextCardStr.Length != 1 || (nextCard = GetCardFromChar(nextCardStr, true)) == null || Array.IndexOf(validCards, nextCardStr) == -1);
 				//nextCardStr[0]
 				NextCardHint nextCardHint = GetNextCardHint(nextCard);
 
@@ -112,9 +118,15 @@ namespace Threesus
 				if (aiDir != null)
 				{
 					Console.Clear();
-					Console.WriteLine("/// YOUR MOVE ///////////////\n");
-					Console.WriteLine("   SWIPE {0}\n", aiDir.Value.ToString().ToUpper());
-					Console.WriteLine("/////////////////////////////\n");
+					//Console.WriteLine("/////////////////////////////\n");
+					string moveDir = "// --->  MOVE {0}  <--- //";
+					string moveBar = "".PadRight(moveDir.Length);
+					Console.WriteLine(moveBar);
+					Console.WriteLine();
+					Console.WriteLine(moveDir);
+					Console.WriteLine();
+					//Console.WriteLine("//  --->  MOVE {0}", aiDir.Value.ToString().ToUpper().PadRight(27, ' ').PadRight(29, '/'));
+					Console.WriteLine(moveBar);
 				}
 				else
 				{
