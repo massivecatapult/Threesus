@@ -20,10 +20,12 @@ namespace Threesus
 			// Build the board and initialize the deck.
 			Deck deck = new Deck(new Rand());
 			Board board = new Board();
-			Console.WriteLine("THREESUS - Threes solver\n");
+			Console.ForegroundColor = ConsoleColor.Yellow;
+			Console.WriteLine("THREESUS - AI-Assisted Threes Solver\n");
+			Console.ResetColor();
 			Console.WriteLine("Enter the game board configuration to begin.");
-			Console.WriteLine("Each line is a list of values separated by commas (for example: 0, 1, 2, 3).");
-			Console.WriteLine("Any valid card value may be entered (up to 6144). Invalid values, such as 0, will count as an empty space.\n");
+			Console.WriteLine("* Each line is a list of values separated by commas (for example: 0, 1, 2, 3).");
+			Console.WriteLine("* Any valid card value may be entered (up to 6144). Invalid values, such as 0, will count as an empty space.\n");
 			for (int y = 0; y < board.Height; y++)
 			{
 				Console.Write("Enter row {0}: ", y + 1);
@@ -67,6 +69,7 @@ namespace Threesus
 			redo:
 
 				// Print the current board status.
+				//Console.Clear();
 				Console.WriteLine("+-------CURRENT BOARD-------+");
 				for(int y = 0; y < board.Height; y++)
 				{
@@ -76,8 +79,20 @@ namespace Threesus
 						Card c = board[x, y];
 						if (c != null)
 						{
-							string cardValue = c.Value.ToString().PadLeft(5, ' ').PadRight(6, ' ') + '|';
+							switch (c.Value)
+							{
+								case 1:
+									Console.ForegroundColor = ConsoleColor.Cyan;
+									break;
+								case 2:
+									Console.ForegroundColor = ConsoleColor.Magenta;
+									break;
+							}
+							//string cardValue = c.Value.ToString().PadLeft(5, ' ').PadRight(6, ' ') + '|';
+							string cardValue = c.Value.ToString().PadLeft(5, ' ');
 							Console.Write(cardValue);
+							Console.ResetColor();
+							Console.Write(" |");
 						}
 						else
 							Console.Write("      |");
@@ -92,7 +107,7 @@ namespace Threesus
 				Console.WriteLine();
 
 				// Get the next card.
-				Console.Write("What is the next card? ");
+				Console.Write("What is the next card (1, 2, 3, or +)? ");
 				string nextCardStr;
 				string[] validCards = { "1", "2", "3", "+" };
 				Card nextCard;
@@ -100,7 +115,7 @@ namespace Threesus
 				do
 				{
 					nextCardStr = Console.ReadLine();
-					if(nextCardStr == "undo")
+					if(nextCardStr == "undo" && boardsStack.Count > 0 && decksStack.Count > 0) 
 					{
 						board = boardsStack.Pop();
 						deck = decksStack.Pop();
@@ -113,20 +128,18 @@ namespace Threesus
 				NextCardHint nextCardHint = GetNextCardHint(nextCard);
 
 				// Choose a move.
-				Console.Write("Thinking...");
+				Console.Write("\nThinking...");
 				ShiftDirection? aiDir = _bot.GetNextMove(new FastBoard(board), new FastDeck(deck), nextCardHint);
 				if (aiDir != null)
 				{
 					Console.Clear();
 					//Console.WriteLine("/////////////////////////////\n");
-					string moveDir = "// --->  MOVE {0}  <--- //";
-					string moveBar = "".PadRight(moveDir.Length);
+					string moveDir = "//  --->  MOVE " + aiDir.Value.ToString().ToUpper() + "  <---  //";
+					string moveBar = "".PadRight(moveDir.Length, '/');
 					Console.WriteLine(moveBar);
-					Console.WriteLine();
 					Console.WriteLine(moveDir);
-					Console.WriteLine();
 					//Console.WriteLine("//  --->  MOVE {0}", aiDir.Value.ToString().ToUpper().PadRight(27, ' ').PadRight(29, '/'));
-					Console.WriteLine(moveBar);
+					Console.WriteLine(moveBar + "\n");
 				}
 				else
 				{
@@ -156,8 +169,12 @@ namespace Threesus
 						for(int x = 0; x < board.Width; x++)
 						{
 							int index = newCardCells.IndexOf(new IntVector2D(x, y));
-							if(index >= 0)
+							if (index >= 0)
+							{
+								Console.ForegroundColor = ConsoleColor.Yellow;
 								Console.Write(" " + "abcd"[index] + " ");
+								Console.ResetColor();
+							}
 							else
 								Console.Write(" . ");
 						}
@@ -176,6 +193,7 @@ namespace Threesus
 				}
 				else
 				{
+					Console.Write("We already know where the new card appeared!\n");
 					newCardIndex = 0;
 				}
 
@@ -198,6 +216,7 @@ namespace Threesus
 
 				boardsStack.Push(new Board(board));
 				decksStack.Push(new Deck(deck));
+                Console.WriteLine();
 			}
 
 			Console.WriteLine("FINAL SCORE IS {0}.", board.GetTotalScore());
