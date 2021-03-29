@@ -70,7 +70,7 @@ namespace Threesus
 
 				// Print the current board status.
 				//Console.Clear();
-				Console.WriteLine("+-------CURRENT BOARD-------+");
+				Console.WriteLine("+------ CURRENT BOARD ------+");
 				for(int y = 0; y < board.Height; y++)
 				{
 					Console.Write("|");
@@ -103,7 +103,9 @@ namespace Threesus
 				//string score = board.GetTotalScore().ToString();
 				//score = "SCORE: " + score;
 				//Console.WriteLine(score.PadLeft(18, '*').PadRight(29, '*'));
+				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.WriteLine("SCORE: {0}", board.GetTotalScore());
+				Console.ResetColor();
 				Console.WriteLine();
 
 				// Get the next card.
@@ -136,10 +138,12 @@ namespace Threesus
 					//Console.WriteLine("/////////////////////////////\n");
 					string moveDir = "//  --->  MOVE " + aiDir.Value.ToString().ToUpper() + "  <---  //";
 					string moveBar = "".PadRight(moveDir.Length, '/');
+					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.WriteLine(moveBar);
 					Console.WriteLine(moveDir);
 					//Console.WriteLine("//  --->  MOVE {0}", aiDir.Value.ToString().ToUpper().PadRight(27, ' ').PadRight(29, '/'));
 					Console.WriteLine(moveBar + "\n");
+					Console.ResetColor();
 				}
 				else
 				{
